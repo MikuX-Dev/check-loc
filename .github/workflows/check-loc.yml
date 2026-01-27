@@ -1,29 +1,32 @@
-name: Check GitLab CE Latest Tag LOC
+name: Check GitLab CE LOC
 
 on:
-  workflow_dispatch: # Allows manual trigger
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
   push:
    branches: main
 
 jobs:
-  check-loc:
+  count-loc:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout GitLab FOSS (CE) latest tag
-        uses: actions/checkout@v4
-        with:
-          repository: 'gitlab-org/gitlab-foss'
-          ref: v18.8.0-rc44
-          path: 'gitlab-ce-source'
+      - name: Install cloc
+        run: sudo apt-get update && sudo apt-get install -y cloc
 
-      - name: Count Lines of Code (cloc)
-        uses: djdefi/cloc-action@7
-        with:
-          options: --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
-          directory: 'gitlab-ce-source'
+      - name: Get Latest GitLab CE Tag
+        id: get_tag
+        run: |
+          # Fetch only the tags from the remote GitLab CE repository
+          TAG=$(git ls-remote --tags --sort="v:refname" https://gitlab.com/gitlab-org/gitlab-foss | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
+          echo "latest_tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Latest tag found: $TAG"
 
-      - name: Upload LOC Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitlab-ce-loc-report
-          path: cloc_report.txt # cloc-action typically outputs to stdout; use redirection if needed
+      - name: Shallow Clone Latest Tag
+        run: |
+          # Clone only the specific latest tag to minimize download size
+          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://gitlab.com/gitlab-org/gitlab-foss gitlab-ce
+
+      - name: Run cloc on Repository
+        run: |
+          cd gitlab-ce
+          # Run cloc to count lines of code, excluding common non-code files
+          cloc . --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
