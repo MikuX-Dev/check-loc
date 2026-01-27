@@ -25,7 +25,7 @@ jobs:
           path: 'gitlab-ce-source'
 
       - name: Count Lines of Code (cloc)
-        uses: djdefi/cloc-action@v6
+        uses: djdefi/cloc-action@6
         with:
           options: --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
           directory: 'gitlab-ce-source'
