@@ -1,0 +1,37 @@
+name: Check GitLab CE Latest Tag LOC
+
+on:
+  workflow_dispatch: # Allows manual trigger
+  push:
+   branches: main
+
+jobs:
+  check-loc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest GitLab CE tag
+        id: get_tag
+        run: |
+          # Fetch the latest tag name from GitLab's API
+          LATEST_TAG=$(curl --silent "https://gitlab.com" | jq -r '.[0].name')
+          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "Latest tag found: $LATEST_TAG"
+
+      - name: Checkout GitLab FOSS (CE) latest tag
+        uses: actions/checkout@v4
+        with:
+          repository: 'gitlab-org/gitlab-foss'
+          ref: ${{ steps.get_tag.outputs.tag }}
+          path: 'gitlab-ce-source'
+
+      - name: Count Lines of Code (cloc)
+        uses: djdefi/cloc-action@v1.0.1
+        with:
+          options: --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
+          directory: 'gitlab-ce-source'
+
+      - name: Upload LOC Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitlab-ce-loc-report
+          path: cloc_report.txt # cloc-action typically outputs to stdout; use redirection if needed
