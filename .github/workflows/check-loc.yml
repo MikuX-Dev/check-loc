@@ -12,8 +12,15 @@ jobs:
       - name: Get latest GitLab CE tag
         id: get_tag
         run: |
-          # Fetch the latest tag name from GitLab's API
+          # Use the GitLab Tags API for the gitlab-foss project
+          # Order by updated date to find the most recent release
           LATEST_TAG=$(curl --silent "https://gitlab.com" | jq -r '.[0].name')
+          
+          if [ "$LATEST_TAG" == "null" ] || [ -z "$LATEST_TAG" ]; then
+            echo "Error: Could not retrieve tag from GitLab API"
+            exit 1
+          fi
+
           echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
           echo "Latest tag found: $LATEST_TAG"
 
