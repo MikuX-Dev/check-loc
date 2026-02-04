@@ -15,18 +15,18 @@ jobs:
       - name: Get Latest GitLab CE Tag
         id: get_tag
         run: |
-          # Fetch only the tags from the remote GitLab CE repository
-          TAG=$(git ls-remote --tags --sort="v:refname" https://gitlab.com/gitlab-org/gitlab-foss | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
+          # Fetch only the tags from the remote Forgejo repository
+          TAG=$(git ls-remote --tags --sort="v:refname" https://codeberg.org/forgejo/forgejo | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
           echo "latest_tag=$TAG" >> $GITHUB_OUTPUT
           echo "Latest tag found: $TAG"
 
-      - name: Shallow Clone Latest Tag
+      - name: Clone Latest Tag
         run: |
           # Clone only the specific latest tag to minimize download size
-          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://gitlab.com/gitlab-org/gitlab-foss gitlab-ce
+          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://codeberg.org/forgejo/forgejo forgejo 
 
       - name: Run cloc on Repository
         run: |
-          cd gitlab-ce
+          cd forgejo 
           # Run cloc to count lines of code, excluding common non-code files
           cloc . --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
