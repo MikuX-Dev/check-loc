@@ -12,13 +12,13 @@ jobs:
       - name: Install cloc
         run: sudo apt-get update && sudo apt-get install -y cloc
 
-      - name: Get Latest lobsters Tag
-        id: get_tag
-        run: |
+      #- name: Get Latest lobsters Tag
+       # id: get_tag
+       # run: |
           # Fetch only the tags from the remote lobsters repository
-          TAG=$(git ls-remote --tags --sort="v:refname" https://github.com/lobsters/lobsters | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
-          echo "latest_tag=$TAG" >> $GITHUB_OUTPUT
-          echo "Latest tag found: $TAG"
+         # TAG=$(git ls-remote --tags --sort="v:refname" https://github.com/lobsters/lobsters | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
+          #echo "latest_tag=$TAG" >> $GITHUB_OUTPUT
+          #echo "Latest tag found: $TAG"
 
       - name: Clone Latest Tag
         run: |
