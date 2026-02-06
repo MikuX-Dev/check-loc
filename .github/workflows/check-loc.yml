@@ -23,7 +23,8 @@ jobs:
       - name: Clone Latest Tag
         run: |
           # Clone only the specific latest tag to minimize download size
-          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://github.com/lobsters/lobsters lobsters 
+          git clone https://github.com/lobsters/lobsters lobsters 
+      # --branch ${{ steps.get_tag.outputs.latest_tag }}
 
       - name: Run cloc on Repository
         run: |
