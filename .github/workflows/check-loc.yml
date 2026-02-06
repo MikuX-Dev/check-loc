@@ -1,4 +1,4 @@
-name: Check GitLab CE LOC
+name: Check lobsters LOC
 
 on:
   workflow_dispatch: # Allows manual trigger from GitHub Actions tab
@@ -12,21 +12,21 @@ jobs:
       - name: Install cloc
         run: sudo apt-get update && sudo apt-get install -y cloc
 
-      - name: Get Latest GitLab CE Tag
+      - name: Get Latest lobsters Tag
         id: get_tag
         run: |
-          # Fetch only the tags from the remote Forgejo repository
-          TAG=$(git ls-remote --tags --sort="v:refname" https://codeberg.org/forgejo/forgejo | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
+          # Fetch only the tags from the remote lobsters repository
+          TAG=$(git ls-remote --tags --sort="v:refname" https://github.com/lobsters/lobsters | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
           echo "latest_tag=$TAG" >> $GITHUB_OUTPUT
           echo "Latest tag found: $TAG"
 
       - name: Clone Latest Tag
         run: |
           # Clone only the specific latest tag to minimize download size
-          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://codeberg.org/forgejo/forgejo forgejo 
+          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://github.com/lobsters/lobsters lobsters 
 
       - name: Run cloc on Repository
         run: |
-          cd forgejo 
+          cd lobsters 
           # Run cloc to count lines of code, excluding common non-code files
           cloc . --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
