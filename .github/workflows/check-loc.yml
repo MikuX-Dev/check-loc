@@ -1,9 +1,9 @@
-name: Check lobsters LOC
+name: Check Forgejo LOC
 
 on:
-  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+  workflow_dispatch:
   push:
-   branches: main
+    branches: main
 
 jobs:
   count-loc:
@@ -12,22 +12,30 @@ jobs:
       - name: Install cloc
         run: sudo apt-get update && sudo apt-get install -y cloc
 
-      #- name: Get Latest lobsters Tag
-       # id: get_tag
-       # run: |
-          # Fetch only the tags from the remote lobsters repository
-         # TAG=$(git ls-remote --tags --sort="v:refname" https://github.com/lobsters/lobsters | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
-          #echo "latest_tag=$TAG" >> $GITHUB_OUTPUT
-          #echo "Latest tag found: $TAG"
+      - name: Get Latest Forgejo Tag
+        id: get_tag
+        run: |
+          TAG=$(git ls-remote --tags --sort="v:refname" https://codeberg.org/forgejo/forgejo | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
+          echo "latest_tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Clone Latest Tag
         run: |
-          # Clone only the specific latest tag to minimize download size
-          git clone https://github.com/lobsters/lobsters lobsters 
-      # --branch ${{ steps.get_tag.outputs.latest_tag }}
+          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://codeberg.org/forgejo/forgejo forgejo
 
-      - name: Run cloc on Repository
+      - name: LOC for Entire Repo
         run: |
-          cd lobsters 
-          # Run cloc to count lines of code, excluding common non-code files
+          cd forgejo
+          echo "=== LOC: Entire Repository ==="
           cloc . --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
+
+      - name: Find and Count LOC for Each Top-Level Directory
+        run: |
+          cd forgejo
+          echo "=== LOC: By Top-Level Folder ==="
+          for dir in */ ; do
+            # skip if not a directory or hidden git folder
+            if [ -d "$dir" ] && [ "$dir" != ".git/" ]; then
+              echo "--- $dir ---"
+              cloc "$dir" --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
+            fi
+          done
