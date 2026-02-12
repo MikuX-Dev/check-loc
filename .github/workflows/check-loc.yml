@@ -1,4 +1,4 @@
-name: Check sqlc LOC
+name: Check pgq LOC
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ jobs:
       - name: Install cloc
         run: sudo apt-get update && sudo apt-get install -y cloc
 
-      - name: Get Latest Forgejo Tag
+      - name: Get Latest Tag
         id: get_tag
         run: |
           TAG=$(git ls-remote --tags --sort="v:refname" https://github.com/sqlc-dev/sqlc | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
@@ -20,11 +20,11 @@ jobs:
 
       - name: Clone Latest Tag
         run: |
-          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://github.com/sqlc-dev/sqlc forgejo
+          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://github.com/MikuX-Dev/pgq folder
 
       - name: LOC for Entire Repo
         run: |
-          cd forgejo
+          cd folder
           echo "=== LOC: Entire Repository ==="
           cloc . --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
 
