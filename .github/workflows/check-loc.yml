@@ -14,7 +14,7 @@ jobs:
 
       - name: Clone Latest Tag
         run: |
-          git clone https://github.com/MikuX-Dev/pgq folder
+          git clone https://github.com/jmoiron/sqlx folder
 
       - name: LOC for Entire Repo
         run: |
