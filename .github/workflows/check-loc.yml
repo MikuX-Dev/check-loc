@@ -1,4 +1,4 @@
-name: Check Forgejo LOC
+name: Check sqlc LOC
 
 on:
   workflow_dispatch:
@@ -15,12 +15,12 @@ jobs:
       - name: Get Latest Forgejo Tag
         id: get_tag
         run: |
-          TAG=$(git ls-remote --tags --sort="v:refname" https://codeberg.org/forgejo/forgejo | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
+          TAG=$(git ls-remote --tags --sort="v:refname" https://github.com/sqlc-dev/sqlc | tail -n1 | sed 's/.*\///' | sed 's/\^{}//')
           echo "latest_tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Clone Latest Tag
         run: |
-          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://codeberg.org/forgejo/forgejo forgejo
+          git clone --branch ${{ steps.get_tag.outputs.latest_tag }} https://github.com/sqlc-dev/sqlc forgejo
 
       - name: LOC for Entire Repo
         run: |
@@ -28,14 +28,14 @@ jobs:
           echo "=== LOC: Entire Repository ==="
           cloc . --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
 
-      - name: Find and Count LOC for Each Top-Level Directory
-        run: |
-          cd forgejo
-          echo "=== LOC: By Top-Level Folder ==="
-          for dir in */ ; do
-            # skip if not a directory or hidden git folder
-            if [ -d "$dir" ] && [ "$dir" != ".git/" ]; then
-              echo "--- $dir ---"
-              cloc "$dir" --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
-            fi
-          done
+   #   - name: Find and Count LOC for Each Top-Level Directory
+    #    run: |
+     #     cd forgejo
+     #     echo "=== LOC: By Top-Level Folder ==="
+      #    for dir in */ ; do
+     #       # skip if not a directory or hidden git folder
+     #       if [ -d "$dir" ] && [ "$dir" != ".git/" ]; then
+    #          echo "--- $dir ---"
+     #         cloc "$dir" --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
+     #       fi
+     #     done
