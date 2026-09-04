@@ -14,7 +14,7 @@ jobs:
 
       - name: Clone Latest Tag
         run: |
-          git clone https://codeberg.org/mbunkus/mkvtoolnix folder
+          git clone https://github.com/5rahim/seanime.git folder
 
       - name: LOC for Entire Repo
         run: |
@@ -22,14 +22,14 @@ jobs:
           echo "=== LOC: Entire Repository ==="
           cloc . --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
 
-   #   - name: Find and Count LOC for Each Top-Level Directory
-    #    run: |
-     #     cd forgejo
-     #     echo "=== LOC: By Top-Level Folder ==="
-      #    for dir in */ ; do
-     #       # skip if not a directory or hidden git folder
-     #       if [ -d "$dir" ] && [ "$dir" != ".git/" ]; then
-    #          echo "--- $dir ---"
-     #         cloc "$dir" --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
-     #       fi
-     #     done
+      - name: Find and Count LOC for Each Top-Level Directory
+        run: |
+          cd folder
+          echo "=== LOC: By Top-Level Folder ==="
+          for dir in */ ; do
+            # skip if not a directory or hidden git folder
+            if [ -d "$dir" ] && [ "$dir" != ".git/" ]; then
+              echo "--- $dir ---"
+              cloc "$dir" --exclude-dir=.git,tmp,log --not-match-f='.*\.spec\.js'
+            fi
+          done
